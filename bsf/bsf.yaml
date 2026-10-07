@@ -1,0 +1,28 @@
+db_uri: mongodb://MONGO_IP/open5gs
+
+logger:
+    file:
+      path: /open5gs/install/var/log/open5gs/bsf.log
+
+sbi:
+    server:
+      no_tls: true
+    client:
+      no_tls: true
+
+global:
+  max:
+    ue: MAX_NUM_UE
+  parameter:
+    no_scp: true
+
+bsf:
+    discovery:
+        delegated: no
+    sbi:
+      server:
+        - address: BSF_IP
+          port: 7777
+      client:
+        nrf:
+          - uri: http://NRF_IP:7777
