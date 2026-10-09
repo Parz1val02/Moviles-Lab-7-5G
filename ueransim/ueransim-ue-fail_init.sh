@@ -26,17 +26,22 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if [[ -z "$COMPONENT_NAME" ]]; then
-	echo "Error: COMPONENT_NAME environment variable not set"; exit 1;
-elif [[ "$COMPONENT_NAME" =~ ^(ueransim-gnb[[:digit:]]*$) ]]; then
-	echo "Deploying component: '$COMPONENT_NAME'"
-	/mnt/ueransim/${COMPONENT_NAME}_init.sh
-elif [[ "$COMPONENT_NAME" =~ ^(ueransim-ue[[:digit:]]*$) ]]; then
-	echo "Deploying component: '$COMPONENT_NAME'"
-	/mnt/ueransim/${COMPONENT_NAME}_init.sh
-elif [[ "$COMPONENT_NAME" =~ ^ueransim-ue-fail ]]; then
-	echo "Deploying component: '$COMPONENT_NAME'"
-	/mnt/ueransim/${COMPONENT_NAME}_init.sh
-else
-	echo "Error: Invalid component name: '$COMPONENT_NAME'"
-fi
+export IP_ADDR=$(awk 'END{print $1}' /etc/hosts)
+
+cp /mnt/ueransim/${COMPONENT_NAME}.yaml /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|MNC|'$MNC'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|MCC|'$MCC'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+
+sed -i 's|UE1_KI|'$UE1_KI'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|UE1_OP|'$UE1_OP'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|UE1_AMF|'$UE1_AMF'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|UE1_IMEISV|'$UE1_IMEISV'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|UE1_IMEI|'$UE1_IMEI'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|UE1_IMSI_FAIL|'$UE1_IMSI_FAIL'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+sed -i 's|NR_GNB_IP|'$NR_GNB_IP'|g' /UERANSIM/config/${COMPONENT_NAME}.yaml
+
+./nr-ue -c ../config/${COMPONENT_NAME}.yaml &
+exec bash $@
+
+# Sync docker time
+#ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

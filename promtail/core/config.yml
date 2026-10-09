@@ -1,0 +1,27 @@
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /tmp/promtail/positions-core.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 102400
+
+scrape_configs:
+  - job_name: open5gs-logs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: open5gs
+          domain: core
+          generation: "5g"
+          __path__: /var/log/open5gs/5g/*.log
+
+    pipeline_stages:
+      - regex:
+          source: filename
+          expression: '/var/log/open5gs/5g/(?P<nf>[^.]+)\.log'
+      - labels:
+          nf:

@@ -1,0 +1,160 @@
+services:
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yml
+    env_file:
+      - .env
+    volumes:
+      - loki-data:/loki
+      - ./loki:/etc/loki
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3100:3100"
+    networks:
+      default:
+        ipv4_address: ${LOKI_IP}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3100/ready",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: promtail
+    command: -config.file=/etc/promtail/config.yml
+    env_file:
+      - .env
+    volumes:
+      - ./promtail/core/:/etc/promtail
+      - promtail-data:/tmp/promtail
+      - open5gs_logs:/var/log/open5gs/5g:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      default:
+        ipv4_address: ${PROMTAIL_IP}
+    depends_on:
+      loki:
+        condition: service_healthy
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.10.0
+    container_name: prometheus
+    env_file:
+      - .env
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus:/etc/prometheus
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    command:
+      - --config.file=/etc/prometheus/configs/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --storage.tsdb.retention.time=20h
+      - --storage.tsdb.retention.size=1GB
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+      - --web.external-url=http://localhost:9090
+      - --web.enable-remote-write-receiver
+    expose:
+      - "9090/tcp"
+    ports:
+      - "9090:9090/tcp"
+    networks:
+      default:
+        ipv4_address: ${METRICS_IP}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: grafana
+    env_file:
+      - .env
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana:/mnt/grafana
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_PATHS_DATA=/var/lib/grafana
+      - METRICS_IP=${METRICS_IP}
+      - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ALERTING_ENABLED=false
+      - GF_UNIFIED_ALERTING_ENABLED=false
+    expose:
+      - "3000/tcp"
+    ports:
+      - "3000:3000/tcp"
+    networks:
+      default:
+        ipv4_address: ${GRAFANA_IP}
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  default:
+    name: docker_open5gs_default
+    external: true
+    ipam:
+      config:
+        - subnet: ${TEST_NETWORK}
+
+volumes:
+  prometheus-data:
+    name: open5gs_prometheus_data
+  grafana-data:
+    name: open5gs_grafana_data
+  loki-data:
+    name: open5gs_loki_data
+  promtail-data:
+    name: open5gs_promtail_data
+  open5gs_logs:
+    external: true
+    name: open5gs_logs

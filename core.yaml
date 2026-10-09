@@ -48,7 +48,7 @@ services:
       - COMPONENT_NAME=nrf
     volumes:
       - ./nrf:/mnt/nrf
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -68,7 +68,7 @@ services:
       - COMPONENT_NAME=ausf
     volumes:
       - ./ausf:/mnt/ausf
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -88,7 +88,7 @@ services:
       - COMPONENT_NAME=udr
     volumes:
       - ./udr:/mnt/udr
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -108,7 +108,7 @@ services:
       - COMPONENT_NAME=udm
     volumes:
       - ./udm:/mnt/udm
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -130,7 +130,7 @@ services:
       - DEPLOY_MODE=5G
     volumes:
       - ./smf:/mnt/smf
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -158,7 +158,7 @@ services:
       - COMPONENT_NAME=upf
     volumes:
       - ./upf:/mnt/upf
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -189,7 +189,7 @@ services:
       - COMPONENT_NAME=amf
     volumes:
       - ./amf:/mnt/amf
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -211,7 +211,7 @@ services:
       - COMPONENT_NAME=pcf
     volumes:
       - ./pcf:/mnt/pcf
-      - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+      - open5gs_logs:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -232,7 +232,7 @@ services:
         - COMPONENT_NAME=bsf
       volumes:
         - ./bsf:/mnt/bsf
-        - open5gs_5g_logs:/open5gs/install/var/log/open5gs
+        - open5gs_logs:/open5gs/install/var/log/open5gs
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
       expose:
@@ -251,5 +251,5 @@ networks:
 volumes:
   mongodbdata:
     name: open5gs_mongodbdata
-  open5gs_5g_logs:
+  open5gs_logs:
     name: open5gs_logs
