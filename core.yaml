@@ -16,6 +16,7 @@ services:
     networks:
       default:
         ipv4_address: ${MONGO_IP}
+    restart: unless-stopped
 
   webui:
     image: docker_open5gs
@@ -38,6 +39,7 @@ services:
     networks:
       default:
         ipv4_address: ${WEBUI_IP}
+    restart: unless-stopped
 
   nrf:
     image: docker_open5gs
@@ -56,6 +58,7 @@ services:
     networks:
       default:
         ipv4_address: ${NRF_IP}
+    restart: unless-stopped
 
   ausf:
     image: docker_open5gs
@@ -76,6 +79,7 @@ services:
     networks:
       default:
         ipv4_address: ${AUSF_IP}
+    restart: unless-stopped
 
   udr:
     image: docker_open5gs
@@ -96,6 +100,7 @@ services:
     networks:
       default:
         ipv4_address: ${UDR_IP}
+    restart: unless-stopped
 
   udm:
     image: docker_open5gs
@@ -116,6 +121,7 @@ services:
     networks:
       default:
         ipv4_address: ${UDM_IP}
+    restart: unless-stopped
 
   smf:
     image: docker_open5gs
@@ -145,6 +151,7 @@ services:
     networks:
       default:
         ipv4_address: ${SMF_IP}
+    restart: unless-stopped
 
   upf:
     image: docker_open5gs
@@ -173,6 +180,7 @@ services:
     networks:
       default:
         ipv4_address: ${UPF_IP}
+    restart: unless-stopped
 
   amf:
     image: docker_open5gs
@@ -199,6 +207,7 @@ services:
     networks:
       default:
         ipv4_address: ${AMF_IP}
+    restart: unless-stopped
 
   pcf:
     image: docker_open5gs
@@ -220,30 +229,34 @@ services:
     networks:
       default:
         ipv4_address: ${PCF_IP}
+    restart: unless-stopped
 
   bsf:
-      image: docker_open5gs
-      depends_on:
-        - nrf
-      container_name: bsf
-      env_file:
-        - .env
-      environment:
-        - COMPONENT_NAME=bsf
-      volumes:
-        - ./bsf:/mnt/bsf
-        - open5gs_logs:/open5gs/install/var/log/open5gs
-        - /etc/timezone:/etc/timezone:ro
-        - /etc/localtime:/etc/localtime:ro
-      expose:
-        - "7777/tcp"
-      networks:
-        default:
-          ipv4_address: ${BSF_IP}
+    image: docker_open5gs
+    depends_on:
+      - nrf
+    container_name: bsf
+    env_file:
+      - .env
+    environment:
+      - COMPONENT_NAME=bsf
+    volumes:
+      - ./bsf:/mnt/bsf
+      - open5gs_logs:/open5gs/install/var/log/open5gs
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "7777/tcp"
+    networks:
+      default:
+        ipv4_address: ${BSF_IP}
+    restart: unless-stopped
 
 networks:
   default:
     name: docker_open5gs_default
+    driver_opts:
+      com.docker.network.bridge.name: br-open5gs
     ipam:
       config:
         - subnet: ${TEST_NETWORK}
