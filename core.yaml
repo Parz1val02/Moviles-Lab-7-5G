@@ -254,7 +254,7 @@ services:
 
 networks:
   default:
-    name: docker_open5gs_default
+    name: open5gs_network
     driver_opts:
       com.docker.network.bridge.name: br-open5gs
     ipam:

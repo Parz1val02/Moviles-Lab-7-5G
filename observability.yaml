@@ -140,11 +140,8 @@ services:
 
 networks:
   default:
-    name: docker_open5gs_default
+    name: open5gs_network
     external: true
-    ipam:
-      config:
-        - subnet: ${TEST_NETWORK}
 
 volumes:
   prometheus-data:
