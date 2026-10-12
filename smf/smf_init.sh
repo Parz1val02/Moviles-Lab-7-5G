@@ -37,10 +37,6 @@ UE_IPV4_INTERNET_APN_GATEWAY_IP=$(python3 /mnt/smf/ip_utils.py --ip_range $UE_IP
 UE_IPV4_IMS_TUN_IP=$(python3 /mnt/smf/ip_utils.py --ip_range $UE_IPV4_IMS)
 
 cp /mnt/smf/smf.yaml install/etc/open5gs
-if [[ ${DEPLOY_MODE} == 4G ]];
-then
-    cp /mnt/smf/smf_4g.yaml install/etc/open5gs/smf.yaml
-fi
 cp /mnt/smf/smf.conf install/etc/freeDiameter
 cp /mnt/smf/make_certs.sh install/etc/freeDiameter
 

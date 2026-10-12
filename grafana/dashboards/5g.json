@@ -48,8 +48,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
               }
             ]
           }
@@ -483,8 +487,7 @@
           "range": true,
           "refId": "D"
         }
-      ],
-      "description": "All lines should be equal. Line widths are nested so overlapping series stay visible; a line that stays below the others shows where a session got stuck."
+      ]
     },
     {
       "id": 5,
@@ -669,6 +672,6 @@
   "timezone": "browser",
   "title": "5G core",
   "uid": "cffnniv0qfu2oa",
-  "version": 6,
+  "version": 1,
   "weekStart": ""
 }
