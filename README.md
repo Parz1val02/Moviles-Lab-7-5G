@@ -5,10 +5,11 @@
 Install Docker from the official guide:
 https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
 
-Add the current user to the docker group (log out and back in, or run `newgrp docker`, for it to apply):
+Add the current user to the docker group:
 
 ```
 sudo usermod -aG docker $USER
+newgrp docker
 ```
 
 ## Pull Open5GS image
@@ -59,6 +60,8 @@ docker compose -f observability.yaml ps
 | Slice (S-NSSAI)    | SST 1                              |
 | DNN                | internet, IPv4                     |
 
+![Provisioned UE](misc/webui.png)
+
 ### Capture traffic on docker bridge interface
 
 On a second terminal, start the capture **before** deploying the RAN components:
@@ -94,14 +97,49 @@ docker compose -f ran.yaml up -d nr_ue_fail
 2. Log in with `open5gs` and `open5gs`
 3. Navigate to the 5G core dashboard to view metrics and logs
 
-### Terminate scenario
+![5G core dashboard](misc/dashboard1.png)
+![5G core dashboard](misc/dashboard2.png)
+![5G core dashboard](misc/dashboard3.png)
 
-Stop the traffic capture with `Ctrl+C` in the second terminal
+### Conclude scenario
 
-Stop running containers in the following order:
+Stop RAN containers:
 
 ```
 docker compose -f ran.yaml down
+```
+
+Stop the traffic capture with `Ctrl+C` in the second terminal
+
+Finally, remove the remaining containers:
+
+```
 docker compose -f observability.yaml down -v
 docker compose -f core.yaml down -v
+```
+
+### Visualize traffic in Wireshark
+
+Open the pcap file from the traffic capture in Wireshark
+
+Open5GS SBI uses unencrypted HTTP/2 on port 7777, which Wireshark does not recognize on its own. It has to be told how to decode it:
+ 
+1. Go to **Analyze > Decode As...**
+2. Click + and fill in each column:
+
+| Column  | Value                          |
+| ------- | ------------------------------ |
+| Field   | `TCP port`                     |
+| Value   | `7777`                         |
+| Default | `(none)`                       |
+| Current | `HTTP2` (do not leave it blank) |
+
+![HTTP2 decode](misc/decode.png)
+ 
+3. Accept and apply the `http2` filter.
+
+4. Aplly the following filter to view 5G traffic
+
+```
+ngap || nas-5gs || pfcp || http2.headers || gtp || icmp
 ```
